@@ -51,6 +51,24 @@ export default function WeatherDashboard() {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isHardwareModalOpen, setIsHardwareModalOpen] = useState<boolean>(false);
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('aeropulse_theme') as 'dark' | 'light' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.body.className = savedTheme;
+    }
+  }, []);
+
+  const handleToggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('aeropulse_theme', nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    document.body.className = nextTheme;
+  };
 
   // Fetch telemetry from REST API
   const fetchTelemetry = useCallback(async (silent = false) => {
@@ -150,8 +168,8 @@ export default function WeatherDashboard() {
   // Fallback initial values if no reading in database yet
   const activeReading: Reading = latest || {
     id: 0,
-    temperature: 24.5,
-    humidity: 58.0,
+    temperature: 36.8,
+    humidity: 64.0,
     rainValue: 840,
     rainStatus: 'NO RAIN',
     irValue: 1,
@@ -180,6 +198,8 @@ export default function WeatherDashboard() {
         isLive={isLive}
         lastUpdated={latest ? latest.createdAt : null}
         totalRecords={totalCount}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
         onOpenHardwareModal={() => setIsHardwareModalOpen(true)}
         onRefresh={() => fetchTelemetry(false)}
         isRefreshing={isRefreshing}
@@ -195,34 +215,32 @@ export default function WeatherDashboard() {
         }}
       >
         {/* Temperature Card */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setTempUnit(tempUnit === 'C' ? 'F' : 'C')}
-            style={{
-              position: 'absolute',
-              top: '1.5rem',
-              right: '1.5rem',
-              zIndex: 10,
-              background: 'rgba(255, 255, 255, 0.08)',
-              color: 'var(--accent-cyan)',
-              border: '1px solid var(--border-glass)',
-              borderRadius: '6px',
-              padding: '0.2rem 0.5rem',
-              fontSize: '0.72rem',
-              fontFamily: 'var(--font-mono)',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}
-          >
-            Switch to °{tempUnit === 'C' ? 'F' : 'C'}
-          </button>
-          <MetricCard
-            title="Temperature"
-            value={displayTemp(activeReading.temperature)}
-            unit={`°${tempUnit}`}
-            icon="🌡️"
-            accentColor="#06b6d4"
-            secondaryText={`Feels like ${displayTemp(heatIndex)}°${tempUnit} &bull; DHT11 Sensor`}
+        <MetricCard
+          title="Temperature"
+          value={displayTemp(activeReading.temperature)}
+          unit={`°${tempUnit}`}
+          icon="🌡️"
+          accentColor="#06b6d4"
+          topAction={
+            <button
+              onClick={() => setTempUnit(tempUnit === 'C' ? 'F' : 'C')}
+              title={`Switch unit to °${tempUnit === 'C' ? 'F' : 'C'}`}
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: 'var(--accent-cyan)',
+                border: '1px solid var(--border-glass)',
+                borderRadius: '6px',
+                padding: '0.2rem 0.5rem',
+                fontSize: '0.72rem',
+                fontFamily: 'var(--font-mono)',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+            >
+              °{tempUnit === 'C' ? 'F' : 'C'}
+            </button>
+          }
+          secondaryText={`Feels like ${displayTemp(heatIndex)}°${tempUnit} • DHT11 Sensor`}
             minVal={
               summary
                 ? tempUnit === 'F'
@@ -259,7 +277,6 @@ export default function WeatherDashboard() {
                   : 'success',
             }}
           />
-        </div>
 
         {/* Humidity Card */}
         <MetricCard

@@ -6,6 +6,8 @@ interface HeaderProps {
   isLive: boolean;
   lastUpdated: string | null;
   totalRecords: number;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
   onOpenHardwareModal: () => void;
   onRefresh: () => void;
   isRefreshing: boolean;
@@ -15,6 +17,8 @@ export const Header: React.FC<HeaderProps> = ({
   isLive,
   lastUpdated,
   totalRecords,
+  theme = 'dark',
+  onToggleTheme,
   onOpenHardwareModal,
   onRefresh,
   isRefreshing,
@@ -129,6 +133,29 @@ export const Header: React.FC<HeaderProps> = ({
           >
             Last Ping: {new Date(lastUpdated).toLocaleTimeString()}
           </div>
+        )}
+
+        {onToggleTheme && (
+          <button
+            onClick={onToggleTheme}
+            style={{
+              background: 'rgba(255, 255, 255, 0.06)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-glass)',
+              padding: '0.5rem 0.85rem',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
+            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
         )}
 
         <button

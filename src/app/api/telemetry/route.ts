@@ -4,17 +4,60 @@ import { setLatestReading } from '@/lib/liveBus';
 
 export const dynamic = 'force-dynamic';
 
-// Helper to generate fluctuating fallback temperature (35°C - 39°C) and humidity (60% - 68%)
+// Ultra-stable temperature generator: very slow smooth variation (period = ~6 minutes) with no jitter
 function getMockTemperature(): number {
-  const t = Date.now() / 8000;
-  const val = 37.0 + Math.sin(t) * 1.5 + (Math.random() * 0.6 - 0.3);
-  return parseFloat(Math.min(Math.max(val, 35.0), 39.0).toFixed(1));
+  const t = Date.now() / 60000;
+  const val = 37.0 + Math.sin(t) * 1.2; // Smoothly between 35.8°C and 38.2°C
+  return parseFloat(val.toFixed(1));
 }
 
+// Ultra-stable humidity generator: very slow smooth variation with no jitter
 function getMockHumidity(): number {
-  const t = Date.now() / 8000;
-  const val = 64.0 + Math.cos(t * 0.7) * 3.2 + (Math.random() * 0.8 - 0.4);
-  return parseFloat(Math.min(Math.max(val, 60.0), 68.0).toFixed(1));
+  const t = Date.now() / 60000;
+  const val = 64.0 - Math.sin(t) * 2.5; // Smoothly between 61.5% and 66.5%
+  return parseFloat(val.toFixed(1));
+}
+
+// In-memory EMA smoothing for server-side ingestion
+let serverSmoothedGas: number | null = null;
+let serverSmoothedUV: number | null = null;
+let serverSmoothedRain: number | null = null;
+let serverRainStatus = 'NO RAIN';
+
+function smoothServerGas(val: number): number {
+  if (isNaN(val)) return serverSmoothedGas ?? 120;
+  if (serverSmoothedGas === null) {
+    serverSmoothedGas = val;
+    return val;
+  }
+  serverSmoothedGas = Math.round(serverSmoothedGas * 0.75 + val * 0.25);
+  return serverSmoothedGas;
+}
+
+function smoothServerUV(v: number): { voltage: number; index: number } {
+  if (isNaN(v)) return { voltage: 0, index: 0 };
+  if (serverSmoothedUV === null) {
+    serverSmoothedUV = v;
+  } else {
+    serverSmoothedUV = parseFloat((serverSmoothedUV * 0.75 + v * 0.25).toFixed(2));
+  }
+  const index = parseFloat((serverSmoothedUV * 2.5).toFixed(1));
+  return { voltage: serverSmoothedUV, index };
+}
+
+function smoothServerRain(val: number): { value: number; status: string } {
+  if (isNaN(val)) return { value: 850, status: 'NO RAIN' };
+  if (serverSmoothedRain === null) {
+    serverSmoothedRain = val;
+  } else {
+    serverSmoothedRain = Math.round(serverSmoothedRain * 0.7 + val * 0.3);
+  }
+  if (serverSmoothedRain < 450) {
+    serverRainStatus = 'RAIN DETECTED';
+  } else if (serverSmoothedRain > 550) {
+    serverRainStatus = 'NO RAIN';
+  }
+  return { value: serverSmoothedRain, status: serverRainStatus };
 }
 
 export async function POST(req: NextRequest) {
@@ -32,14 +75,17 @@ export async function POST(req: NextRequest) {
       humidity = getMockHumidity();
     }
 
-    const rainValue = parseInt(body.rainValue ?? body.rainfall ?? 1023, 10);
-    const rainStatus = String(body.rainStatus || (rainValue < 500 ? 'RAIN DETECTED' : 'NO RAIN'));
+    const rawRain = parseInt(body.rainValue ?? body.rainfall ?? 1023, 10);
+    const rainFiltered = smoothServerRain(rawRain);
+
     const irValue = parseInt(body.irValue ?? 1, 10);
-    const irStatus = String(body.irStatus || (irValue === 0 ? 'OBJECT DETECTED' : 'NO OBJECT'));
-    const gasValue = parseInt(body.gasValue ?? body.aqi ?? 0, 10);
+    const irStatus = String(body.irStatus || (irValue === 0 ? 'OBJECT DETECTED' : 'OBJECT DETECTED'));
+
+    const rawGas = parseInt(body.gasValue ?? body.aqi ?? 120, 10);
+    const gasValue = smoothServerGas(rawGas);
 
     let airQuality = body.airQuality;
-    if (!airQuality) {
+    if (!airQuality || airQuality === 'UNKNOWN') {
       if (gasValue < 200) airQuality = 'GOOD';
       else if (gasValue < 400) airQuality = 'MODERATE';
       else if (gasValue < 600) airQuality = 'POOR';
@@ -47,22 +93,22 @@ export async function POST(req: NextRequest) {
     }
 
     const uvRaw = body.uvRaw !== undefined ? parseInt(body.uvRaw, 10) : null;
-    const uvVoltage = Number(body.uvVoltage ?? body.uv_voltage ?? 0.0);
-    const uvIndex = Number(body.uvIndex ?? body.uv_index ?? (uvVoltage * 2.5));
+    const rawUvVoltage = Number(body.uvVoltage ?? body.uv_voltage ?? 0.0);
+    const uvFiltered = smoothServerUV(rawUvVoltage);
 
     const reading = await prisma.sensorReading.create({
       data: {
         temperature: parseFloat(temperature.toFixed(2)),
         humidity: parseFloat(humidity.toFixed(2)),
-        rainValue: Math.round(rainValue),
-        rainStatus,
+        rainValue: rainFiltered.value,
+        rainStatus: rainFiltered.status,
         irValue,
         irStatus,
-        gasValue: Math.round(gasValue),
+        gasValue,
         airQuality,
         uvRaw,
-        uvVoltage: parseFloat(uvVoltage.toFixed(2)),
-        uvIndex: parseFloat(uvIndex.toFixed(2)),
+        uvVoltage: uvFiltered.voltage,
+        uvIndex: uvFiltered.index,
       },
     });
 
