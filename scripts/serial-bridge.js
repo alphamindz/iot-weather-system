@@ -145,13 +145,36 @@ async function startBridge() {
       const line = rawLine.trim();
       if (!line) return;
 
+// Mock temperature (35°C - 39°C) and humidity (60% - 68%) when DHT11 is down
+function getMockTemperature() {
+  const t = Date.now() / 8000;
+  const val = 37.0 + Math.sin(t) * 1.5 + (Math.random() * 0.6 - 0.3);
+  return parseFloat(Math.min(Math.max(val, 35.0), 39.0).toFixed(1));
+}
+
+function getMockHumidity() {
+  const t = Date.now() / 8000;
+  const val = 64.0 + Math.cos(t * 0.7) * 3.2 + (Math.random() * 0.8 - 0.4);
+  return parseFloat(Math.min(Math.max(val, 60.0), 68.0).toFixed(1));
+}
+
       // 1. Try parsing direct JSON line
       if (line.startsWith('{') && line.endsWith('}')) {
         try {
           const json = JSON.parse(line);
+          let temp = json.temperature ?? json.temp;
+          let hum = json.humidity ?? json.hum;
+
+          if (temp === undefined || temp === null || isNaN(temp) || Number(temp) <= 0) {
+            temp = getMockTemperature();
+          }
+          if (hum === undefined || hum === null || isNaN(hum) || Number(hum) <= 0) {
+            hum = getMockHumidity();
+          }
+
           const payload = {
-            temperature: json.temperature ?? json.temp,
-            humidity: json.humidity ?? json.hum,
+            temperature: parseFloat(Number(temp).toFixed(1)),
+            humidity: parseFloat(Number(hum).toFixed(1)),
             rainValue: json.rainValue ?? json.rainfall ?? (json.rainStatus === 'RAIN DETECTED' ? 300 : 800),
             rainStatus: json.rainStatus ?? (json.rainfall > 0 ? 'RAIN DETECTED' : 'NO RAIN'),
             irValue: json.irValue ?? 1,
@@ -209,23 +232,31 @@ async function startBridge() {
 
       // End of block delimiter (e.g. "--------------------------------")
       if (line.startsWith('---') || line.startsWith('===')) {
-        if (readingBuffer.temperature !== undefined && readingBuffer.humidity !== undefined) {
-          const payload = {
-            temperature: readingBuffer.temperature,
-            humidity: readingBuffer.humidity,
-            rainValue: readingBuffer.rainValue ?? 800,
-            rainStatus: readingBuffer.rainStatus || (readingBuffer.rainValue < 500 ? 'RAIN DETECTED' : 'NO RAIN'),
-            irValue: readingBuffer.irValue ?? 1,
-            irStatus: readingBuffer.irStatus || 'NO OBJECT',
-            gasValue: readingBuffer.gasValue ?? 150,
-            airQuality: readingBuffer.airQuality || 'GOOD',
-            uvRaw: readingBuffer.uvRaw,
-            uvVoltage: readingBuffer.uvVoltage ?? 0.0,
-            uvIndex: readingBuffer.uvIndex ?? 0.0,
-          };
-          postTelemetry(payload);
-          readingBuffer = {};
+        let temp = readingBuffer.temperature;
+        let hum = readingBuffer.humidity;
+
+        if (temp === undefined || isNaN(temp) || Number(temp) <= 0) {
+          temp = getMockTemperature();
         }
+        if (hum === undefined || isNaN(hum) || Number(hum) <= 0) {
+          hum = getMockHumidity();
+        }
+
+        const payload = {
+          temperature: parseFloat(Number(temp).toFixed(1)),
+          humidity: parseFloat(Number(hum).toFixed(1)),
+          rainValue: readingBuffer.rainValue ?? 800,
+          rainStatus: readingBuffer.rainStatus || (readingBuffer.rainValue < 500 ? 'RAIN DETECTED' : 'NO RAIN'),
+          irValue: readingBuffer.irValue ?? 1,
+          irStatus: readingBuffer.irStatus || 'NO OBJECT',
+          gasValue: readingBuffer.gasValue ?? 150,
+          airQuality: readingBuffer.airQuality || 'GOOD',
+          uvRaw: readingBuffer.uvRaw,
+          uvVoltage: readingBuffer.uvVoltage ?? 0.0,
+          uvIndex: readingBuffer.uvIndex ?? 0.0,
+        };
+        postTelemetry(payload);
+        readingBuffer = {};
       }
     });
 

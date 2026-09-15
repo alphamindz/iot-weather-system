@@ -12,6 +12,7 @@ interface MetricCardProps {
   minVal?: number;
   maxVal?: number;
   avgVal?: number;
+  topAction?: React.ReactNode;
   statusBadge?: {
     text: string;
     type: 'success' | 'warning' | 'danger' | 'info' | 'neutral';
@@ -28,6 +29,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   minVal,
   maxVal,
   avgVal,
+  topAction,
   statusBadge,
 }) => {
   const getBadgeStyle = (type: string) => {
