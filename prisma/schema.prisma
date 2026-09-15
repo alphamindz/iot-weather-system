@@ -1,0 +1,29 @@
+// Prisma Schema for IoT Weather Monitoring System
+// Using Prisma 5 with SQLite database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SensorReading {
+  id          Int      @id @default(autoincrement())
+  temperature Float    // Temperature in Celsius (°C) from DHT11
+  humidity    Float    // Relative Humidity (%) from DHT11
+  rainValue   Int      // Analog reading from Rain sensor (0 - 1023)
+  rainStatus  String   // "RAIN DETECTED" or "NO RAIN"
+  irValue     Int      // Digital reading from IR sensor (0 or 1)
+  irStatus    String   // "OBJECT DETECTED" or "NO OBJECT"
+  gasValue    Int      // Analog reading from MQ-135 sensor
+  airQuality  String   // "GOOD", "MODERATE", "POOR", "VERY POOR"
+  uvRaw       Int?     // Analog raw reading from UV sensor
+  uvVoltage   Float    // Voltage reading from UV sensor (V)
+  uvIndex     Float    // Computed UV Index
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}

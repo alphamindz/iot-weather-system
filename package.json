@@ -1,0 +1,32 @@
+{
+  "name": "iotsweathersystem",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio",
+    "bridge": "node scripts/serial-bridge.js",
+    "simulate": "node scripts/simulator.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "serialport": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "prisma": "^5.22.0",
+    "typescript": "^5"
+  }
+}
