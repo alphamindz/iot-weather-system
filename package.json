@@ -11,7 +11,8 @@
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "bridge": "node scripts/serial-bridge.js",
-    "simulate": "node scripts/simulator.js"
+    "simulate": "node scripts/simulator.js",
+    "sync:lucknow": "node scripts/sync-lucknow.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

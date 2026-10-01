@@ -160,8 +160,8 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                 onClick={() => setSelectedMetric(m)}
                 style={{
                   background: isSelected
-                    ? 'rgba(255, 255, 255, 0.12)'
-                    : 'rgba(255, 255, 255, 0.04)',
+                    ? 'rgba(6, 182, 212, 0.15)'
+                    : 'var(--item-bg)',
                   color: isSelected
                     ? metricConfigs[m].color
                     : 'var(--text-secondary)',
@@ -200,7 +200,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                     range === r
                       ? 'rgba(59, 130, 246, 0.2)'
                       : 'transparent',
-                  color: range === r ? '#60a5fa' : 'var(--text-muted)',
+                  color: range === r ? 'var(--accent-blue)' : 'var(--text-muted)',
                   border:
                     range === r
                       ? '1px solid rgba(59, 130, 246, 0.4)'
@@ -258,14 +258,14 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                   y1={y}
                   x2={svgWidth - padding.right}
                   y2={y}
-                  stroke="rgba(255, 255, 255, 0.05)"
+                  stroke="var(--chart-grid)"
                   strokeDasharray="4 4"
                 />
                 <text
                   x={padding.left - 8}
                   y={y + 4}
                   textAnchor="end"
-                  fill="#64748b"
+                  fill="var(--text-muted)"
                   fontSize="10"
                   fontFamily="var(--font-mono)"
                 >
@@ -307,7 +307,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                   cy={pt.y}
                   r={hoverIndex === idx ? '5' : '3'}
                   fill={currentCfg.color}
-                  stroke="#07090e"
+                  stroke="var(--chart-dot-stroke)"
                   strokeWidth="2"
                 />
               )}
@@ -343,7 +343,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
               <text
                 x={padding.left}
                 y={svgHeight - 10}
-                fill="#64748b"
+                fill="var(--text-muted)"
                 fontSize="10"
                 fontFamily="var(--font-mono)"
               >
@@ -356,7 +356,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                 x={svgWidth - padding.right}
                 y={svgHeight - 10}
                 textAnchor="end"
-                fill="#64748b"
+                fill="var(--text-muted)"
                 fontSize="10"
                 fontFamily="var(--font-mono)"
               >
@@ -377,11 +377,11 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
             position: 'absolute',
             top: '1.5rem',
             right: '1.75rem',
-            background: 'rgba(15, 23, 42, 0.95)',
+            background: 'var(--tooltip-bg)',
             border: `1px solid ${currentCfg.color}`,
             borderRadius: 'var(--radius-sm)',
             padding: '0.5rem 0.9rem',
-            boxShadow: `0 4px 20px rgba(0,0,0,0.5)`,
+            boxShadow: `0 4px 20px rgba(0,0,0,0.15)`,
             fontSize: '0.8rem',
             fontFamily: 'var(--font-mono)',
             zIndex: 10,

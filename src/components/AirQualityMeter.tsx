@@ -5,14 +5,18 @@ import React from 'react';
 interface AirQualityMeterProps {
   gasValue: number;
   airQuality: string;
+  pm25?: number;
+  pm10?: number;
 }
 
 export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
   gasValue,
   airQuality,
+  pm25,
+  pm10,
 }) => {
-  // Normalize percentage for progress bar (0 - 700 scale)
-  const percentage = Math.min(Math.max((gasValue / 700) * 100, 5), 100);
+  // Normalize percentage for progress bar (0 - 500 scale)
+  const percentage = Math.min(Math.max((gasValue / 400) * 100, 5), 100);
 
   const getStatusConfig = () => {
     switch (airQuality?.toUpperCase()) {
@@ -40,7 +44,7 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
           bg: 'rgba(249, 115, 22, 0.12)',
           border: 'rgba(249, 115, 22, 0.3)',
           label: 'Poor Air Quality',
-          advice: 'Pollutants elevated. Consider reducing prolonged exposure.',
+          advice: 'Pollutants elevated. Consider reducing prolonged outdoor exposure.',
           badgeType: 'POOR',
         };
       case 'VERY POOR':
@@ -50,7 +54,7 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
           bg: 'rgba(244, 63, 94, 0.12)',
           border: 'rgba(244, 63, 94, 0.3)',
           label: 'Hazardous Air Quality',
-          advice: 'High concentration of smoke, CO2, or gas detected. Ventilate immediately.',
+          advice: 'Elevated particulate or combustion gases. Limit physical exertion outside.',
           badgeType: 'VERY POOR',
         };
     }
@@ -115,7 +119,7 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
                 letterSpacing: '0.04em',
               }}
             >
-              MQ-135 Air Quality
+              Air Quality &amp; AQI
             </span>
           </div>
 
@@ -135,7 +139,7 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', margin: '0.6rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', margin: '0.6rem 0' }}>
           <span
             style={{
               fontSize: '2.5rem',
@@ -148,12 +152,12 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
             {gasValue}
           </span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Raw AQI Index
+            US AQI &bull; MQ-135 Index
           </span>
         </div>
 
         {/* Dynamic Gradient Bar */}
-        <div style={{ margin: '1rem 0 0.5rem 0' }}>
+        <div style={{ margin: '0.8rem 0 0.4rem 0' }}>
           <div
             style={{
               height: '8px',
@@ -187,11 +191,51 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
             }}
           >
             <span>0 Good</span>
-            <span>200 Mod</span>
-            <span>400 Poor</span>
-            <span>600+ Hazardous</span>
+            <span>100 Mod</span>
+            <span>200 Poor</span>
+            <span>300+ Hazardous</span>
           </div>
         </div>
+
+        {/* PM2.5 / PM10 Breakdown if available */}
+        {(pm25 !== undefined || pm10 !== undefined) && (
+          <div
+            style={{
+              display: 'flex',
+              gap: '0.6rem',
+              marginTop: '0.75rem',
+              fontSize: '0.72rem',
+              fontFamily: 'var(--font-mono)',
+            }}
+          >
+            {pm25 !== undefined && (
+              <span
+                style={{
+                  background: 'var(--item-bg)',
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '4px',
+                  border: '1px solid var(--border-glass)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                PM2.5: <strong>{pm25} µg/m³</strong>
+              </span>
+            )}
+            {pm10 !== undefined && (
+              <span
+                style={{
+                  background: 'var(--item-bg)',
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '4px',
+                  border: '1px solid var(--border-glass)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                PM10: <strong>{pm10} µg/m³</strong>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div

@@ -1,6 +1,11 @@
 import { NextRequest } from 'next/server';
 import { telemetryBus, getLatestReading } from '@/lib/liveBus';
 import { prisma } from '@/lib/prisma';
+import {
+  syncLucknowTelemetryToDb,
+  getLucknowLiveWeather,
+  generateDynamicLucknowReading,
+} from '@/lib/lucknowWeather';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,52 +14,60 @@ export async function GET(req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
+      let isClosed = false;
+
+      const safeEnqueue = (payload: string) => {
+        if (isClosed) return;
+        try {
+          controller.enqueue(encoder.encode(payload));
+        } catch {
+          isClosed = true;
+        }
+      };
+
       // 1. Send initial current state immediately upon connection
       try {
-        const cached = getLatestReading();
+        let cached = getLatestReading();
+        if (!cached) {
+          const syncResult = await syncLucknowTelemetryToDb(false);
+          cached = syncResult.reading;
+        }
         if (cached) {
-          controller.enqueue(
-            encoder.encode(`event: reading\ndata: ${JSON.stringify(cached)}\n\n`)
-          );
-        } else {
-          const dbLatest = await prisma.sensorReading.findFirst({
-            orderBy: { createdAt: 'desc' },
-          });
-          if (dbLatest) {
-            controller.enqueue(
-              encoder.encode(`event: reading\ndata: ${JSON.stringify(dbLatest)}\n\n`)
-            );
-          }
+          safeEnqueue(`event: reading\ndata: ${JSON.stringify(cached)}\n\n`);
         }
       } catch (err) {
         console.error('Initial SSE telemetry fetch error:', err);
       }
 
-      // 2. Listener for live incoming readings
+      // 2. Listener for incoming live readings (from Arduino or sync)
       const onReading = (reading: any) => {
-        try {
-          controller.enqueue(
-            encoder.encode(`event: reading\ndata: ${JSON.stringify(reading)}\n\n`)
-          );
-        } catch {
-          // Stream might have closed
-        }
+        safeEnqueue(`event: reading\ndata: ${JSON.stringify(reading)}\n\n`);
       };
 
       telemetryBus.on('reading', onReading);
 
-      // 3. Heartbeat ping every 10 seconds to keep connection alive
-      const pingInterval = setInterval(() => {
+      // 3. Dynamic background pulse: ensures dashboard continues to stream live dynamic readings
+      // anchored on real Lucknow weather every 5 seconds
+      const livePulseInterval = setInterval(async () => {
+        if (isClosed) return;
         try {
-          controller.enqueue(encoder.encode(`: ping\n\n`));
-        } catch {
-          clearInterval(pingInterval);
+          // Sync or produce dynamic pulse
+          await syncLucknowTelemetryToDb(false);
+        } catch (err) {
+          console.error('Error generating dynamic Lucknow SSE pulse:', err);
         }
+      }, 8000);
+
+      // 4. Heartbeat ping every 10 seconds to keep connection alive
+      const pingInterval = setInterval(() => {
+        safeEnqueue(`: ping\n\n`);
       }, 10000);
 
       // Clean up when client disconnects
       req.signal.addEventListener('abort', () => {
+        isClosed = true;
         telemetryBus.off('reading', onReading);
+        clearInterval(livePulseInterval);
         clearInterval(pingInterval);
         try {
           controller.close();
@@ -71,3 +84,4 @@ export async function GET(req: NextRequest) {
     },
   });
 }
+

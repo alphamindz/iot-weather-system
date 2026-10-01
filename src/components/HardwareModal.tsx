@@ -51,8 +51,9 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           maxHeight: '90vh',
           overflowY: 'auto',
           padding: '2rem',
-          backgroundColor: '#0c121e',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: 'var(--modal-bg)',
+          border: '1px solid var(--border-glass)',
+          boxShadow: 'var(--shadow-card)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -67,7 +68,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '1.6rem' }}>⚡</span>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 Arduino Uno & Hardware Connection Guide
               </h3>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -79,8 +80,8 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: 'none',
+              background: 'var(--item-bg)',
+              border: '1px solid var(--border-glass)',
               color: 'var(--text-secondary)',
               padding: '0.4rem 0.75rem',
               borderRadius: '6px',
@@ -109,7 +110,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           </p>
           <div
             style={{
-              background: '#070a10',
+              background: 'var(--code-bg)',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
               fontFamily: 'var(--font-mono)',
@@ -118,6 +119,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
               justifyContent: 'space-between',
               alignItems: 'center',
               border: '1px solid var(--border-glass)',
+              color: 'var(--text-primary)',
             }}
           >
             <code>{prismaCmd}</code>
@@ -153,7 +155,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           </p>
           <div
             style={{
-              background: '#070a10',
+              background: 'var(--code-bg)',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
               fontFamily: 'var(--font-mono)',
@@ -162,6 +164,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
               justifyContent: 'space-between',
               alignItems: 'center',
               border: '1px solid var(--border-glass)',
+              color: 'var(--text-primary)',
             }}
           >
             <code>{bridgeCmd}</code>
@@ -200,7 +203,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           </p>
           <div
             style={{
-              background: '#070a10',
+              background: 'var(--code-bg)',
               padding: '0.75rem 1rem',
               borderRadius: '8px',
               fontFamily: 'var(--font-mono)',
@@ -209,6 +212,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
               justifyContent: 'space-between',
               alignItems: 'center',
               border: '1px solid var(--border-glass)',
+              color: 'var(--text-primary)',
             }}
           >
             <code>{simulateCmd}</code>

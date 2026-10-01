@@ -1,24 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { setLatestReading } from '@/lib/liveBus';
+import {
+  getLucknowLiveWeather,
+  syncLucknowTelemetryToDb,
+  generateDynamicLucknowReading,
+  LUCKNOW_COORDS,
+} from '@/lib/lucknowWeather';
 
 export const dynamic = 'force-dynamic';
 
-// Ultra-stable temperature generator: very slow smooth variation (period = ~6 minutes) with no jitter
-function getMockTemperature(): number {
-  const t = Date.now() / 60000;
-  const val = 37.0 + Math.sin(t) * 1.2; // Smoothly between 35.8°C and 38.2°C
-  return parseFloat(val.toFixed(1));
-}
-
-// Ultra-stable humidity generator: very slow smooth variation with no jitter
-function getMockHumidity(): number {
-  const t = Date.now() / 60000;
-  const val = 64.0 - Math.sin(t) * 2.5; // Smoothly between 61.5% and 66.5%
-  return parseFloat(val.toFixed(1));
-}
-
-// In-memory EMA smoothing for server-side ingestion
+// In-memory EMA smoothing for hardware sensor-side ingestion
 let serverSmoothedGas: number | null = null;
 let serverSmoothedUV: number | null = null;
 let serverSmoothedRain: number | null = null;
@@ -64,36 +56,40 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    // Get live Lucknow baseline for accurate fallbacks if sensors disconnect
+    const lucknowMeta = await getLucknowLiveWeather();
+
     let temperature = Number(body.temperature);
     let humidity = Number(body.humidity);
 
-    // If DHT11 sensor is down (reads 0 or NaN), provide mock data with slight fluctuations (35-39°C, 60-68%)
+    // If DHT11 sensor is down (reads 0 or NaN), use real Lucknow ambient baseline
     if (isNaN(temperature) || temperature <= 0) {
-      temperature = getMockTemperature();
+      temperature = lucknowMeta.temperature;
     }
     if (isNaN(humidity) || humidity <= 0) {
-      humidity = getMockHumidity();
+      humidity = lucknowMeta.humidity;
     }
 
-    const rawRain = parseInt(body.rainValue ?? body.rainfall ?? 1023, 10);
+    const rawRain = parseInt(body.rainValue ?? body.rainfall ?? (lucknowMeta.precipitation > 0 ? 300 : 880), 10);
     const rainFiltered = smoothServerRain(rawRain);
 
     const irValue = parseInt(body.irValue ?? 1, 10);
-    const irStatus = String(body.irStatus || (irValue === 0 ? 'OBJECT DETECTED' : 'OBJECT DETECTED'));
+    const irStatus = String(body.irStatus || (irValue === 0 ? 'OBJECT DETECTED' : 'NO OBJECT'));
 
-    const rawGas = parseInt(body.gasValue ?? body.aqi ?? 120, 10);
+    const rawGas = parseInt(body.gasValue ?? body.aqi ?? lucknowMeta.aqi, 10);
     const gasValue = smoothServerGas(rawGas);
 
     let airQuality = body.airQuality;
     if (!airQuality || airQuality === 'UNKNOWN') {
-      if (gasValue < 200) airQuality = 'GOOD';
-      else if (gasValue < 400) airQuality = 'MODERATE';
-      else if (gasValue < 600) airQuality = 'POOR';
+      if (gasValue <= 50) airQuality = 'GOOD';
+      else if (gasValue <= 100) airQuality = 'GOOD';
+      else if (gasValue <= 200) airQuality = 'MODERATE';
+      else if (gasValue <= 300) airQuality = 'POOR';
       else airQuality = 'VERY POOR';
     }
 
     const uvRaw = body.uvRaw !== undefined ? parseInt(body.uvRaw, 10) : null;
-    const rawUvVoltage = Number(body.uvVoltage ?? body.uv_voltage ?? 0.0);
+    const rawUvVoltage = Number(body.uvVoltage ?? body.uv_voltage ?? (lucknowMeta.uvIndex / 2.5));
     const uvFiltered = smoothServerUV(rawUvVoltage);
 
     const reading = await prisma.sensorReading.create({
@@ -120,6 +116,8 @@ export async function POST(req: NextRequest) {
         success: true,
         message: 'Telemetry recorded successfully',
         data: reading,
+        location: LUCKNOW_COORDS,
+        weatherMeta: lucknowMeta,
       },
       { status: 201 }
     );
@@ -135,8 +133,15 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '60', 10), 500);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500);
     const range = searchParams.get('range') || '24h';
+    const forceSync = searchParams.get('sync') === 'true';
+
+    // 1. Automatically sync live Lucknow weather to database if stale or forced
+    await syncLucknowTelemetryToDb(forceSync);
+
+    // 2. Fetch fresh weather metadata for Lucknow
+    const lucknowMeta = await getLucknowLiveWeather(forceSync);
 
     let startDate: Date | undefined;
     const now = new Date();
@@ -165,28 +170,14 @@ export async function GET(req: NextRequest) {
       prisma.sensorReading.count(),
     ]);
 
-    // Clean up any zero/error values in history
-    const history = historyDesc.reverse().map((h, i) => {
-      let temp = h.temperature;
-      let hum = h.humidity;
-      if (temp <= 0) {
-        temp = parseFloat((36.5 + Math.sin((i + Date.now() / 10000) * 0.4) * 1.8).toFixed(1));
-      }
-      if (hum <= 0) {
-        hum = parseFloat((64.0 + Math.cos((i + Date.now() / 10000) * 0.3) * 3.5).toFixed(1));
-      }
-      return {
-        ...h,
-        temperature: temp,
-        humidity: hum,
-      };
-    });
-
-    let patchedLatest = latest ? { ...latest } : null;
-    if (patchedLatest) {
-      if (patchedLatest.temperature <= 0) patchedLatest.temperature = getMockTemperature();
-      if (patchedLatest.humidity <= 0) patchedLatest.humidity = getMockHumidity();
-    }
+    const history = historyDesc.reverse().map((h) => ({
+      ...h,
+      temperature: parseFloat(h.temperature.toFixed(1)),
+      humidity: parseFloat(h.humidity.toFixed(1)),
+      gasValue: Math.round(h.gasValue),
+      uvIndex: parseFloat(h.uvIndex.toFixed(1)),
+      uvVoltage: parseFloat(h.uvVoltage.toFixed(2)),
+    }));
 
     // Calculate quick stats over the selected history
     let summary = null;
@@ -197,24 +188,26 @@ export async function GET(req: NextRequest) {
       const uvs = history.map((h) => h.uvIndex);
 
       summary = {
-        tempMin: Math.min(...temps),
-        tempMax: Math.max(...temps),
+        tempMin: parseFloat(Math.min(...temps).toFixed(1)),
+        tempMax: parseFloat(Math.max(...temps).toFixed(1)),
         tempAvg: parseFloat((temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1)),
-        humMin: Math.min(...hums),
-        humMax: Math.max(...hums),
+        humMin: parseFloat(Math.min(...hums).toFixed(1)),
+        humMax: parseFloat(Math.max(...hums).toFixed(1)),
         humAvg: parseFloat((hums.reduce((a, b) => a + b, 0) / hums.length).toFixed(1)),
         gasMin: Math.min(...gases),
         gasMax: Math.max(...gases),
         gasAvg: Math.round(gases.reduce((a, b) => a + b, 0) / gases.length),
-        uvMin: Math.min(...uvs),
-        uvMax: Math.max(...uvs),
+        uvMin: parseFloat(Math.min(...uvs).toFixed(1)),
+        uvMax: parseFloat(Math.max(...uvs).toFixed(1)),
         uvAvg: parseFloat((uvs.reduce((a, b) => a + b, 0) / uvs.length).toFixed(1)),
       };
     }
 
     return NextResponse.json({
       success: true,
-      latest: patchedLatest,
+      location: LUCKNOW_COORDS,
+      weatherMeta: lucknowMeta,
+      latest: latest || generateDynamicLucknowReading(lucknowMeta),
       history,
       summary,
       totalCount,
@@ -228,3 +221,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

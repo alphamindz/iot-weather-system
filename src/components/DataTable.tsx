@@ -77,7 +77,7 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
             fontSize: '0.75rem',
             fontFamily: 'var(--font-mono)',
             color: 'var(--text-secondary)',
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: 'var(--item-bg)',
             padding: '0.3rem 0.65rem',
             borderRadius: '6px',
             border: '1px solid var(--border-glass)',
@@ -125,11 +125,11 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
                 <tr
                   key={row.id}
                   style={{
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+                    borderBottom: '1px solid var(--border-glass)',
                     transition: 'background 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                    e.currentTarget.style.background = 'var(--item-bg)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
@@ -138,10 +138,10 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
                   <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)' }}>
                     {new Date(row.createdAt).toLocaleTimeString()}
                   </td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#38bdf8', fontWeight: 600 }}>
+                  <td style={{ padding: '0.75rem 1rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>
                     {row.temperature.toFixed(1)}°C
                   </td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#60a5fa' }}>
+                  <td style={{ padding: '0.75rem 1rem', color: 'var(--accent-blue)' }}>
                     {row.humidity.toFixed(1)}%
                   </td>
                   <td style={{ padding: '0.75rem 1rem' }}>
@@ -152,7 +152,7 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
                         borderRadius: '4px',
                         background: isRaining
                           ? 'rgba(6, 182, 212, 0.15)'
-                          : 'rgba(255, 255, 255, 0.05)',
+                          : 'var(--item-bg)',
                         color: isRaining ? 'var(--accent-cyan)' : 'var(--text-muted)',
                       }}
                     >
@@ -182,7 +182,7 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
                       {row.gasValue} &bull; {row.airQuality}
                     </span>
                   </td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#c084fc' }}>
+                  <td style={{ padding: '0.75rem 1rem', color: 'var(--accent-purple)' }}>
                     {row.uvIndex.toFixed(1)} UV ({row.uvVoltage.toFixed(2)}V)
                   </td>
                   <td style={{ padding: '0.75rem 1rem' }}>
@@ -193,7 +193,7 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
                         borderRadius: '4px',
                         background: isObject
                           ? 'rgba(245, 158, 11, 0.15)'
-                          : 'rgba(255, 255, 255, 0.04)',
+                          : 'var(--item-bg)',
                         color: isObject ? 'var(--accent-amber)' : 'var(--text-muted)',
                       }}
                     >

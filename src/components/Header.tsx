@@ -6,22 +6,32 @@ interface HeaderProps {
   isLive: boolean;
   lastUpdated: string | null;
   totalRecords: number;
+  locationName?: string;
+  weatherCondition?: string;
+  weatherIcon?: string;
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
   onOpenHardwareModal: () => void;
   onRefresh: () => void;
+  onSyncLucknow?: () => void;
   isRefreshing: boolean;
+  isSyncing?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   isLive,
   lastUpdated,
   totalRecords,
+  locationName = 'Lucknow, Uttar Pradesh',
+  weatherCondition = 'Clear Sky',
+  weatherIcon = '☀️',
   theme = 'dark',
   onToggleTheme,
   onOpenHardwareModal,
   onRefresh,
+  onSyncLucknow,
   isRefreshing,
+  isSyncing = false,
 }) => {
   return (
     <header
@@ -32,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
         alignItems: 'center',
         gap: '1rem',
         padding: '1.25rem 1.75rem',
-        marginBottom: '2rem',
+        marginBottom: '1.5rem',
         borderRadius: 'var(--radius-lg)',
         background: 'var(--header-bg)',
         backdropFilter: 'blur(20px)',
@@ -44,21 +54,22 @@ export const Header: React.FC<HeaderProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <div
           style={{
-            width: '46px',
-            height: '46px',
+            width: '48px',
+            height: '48px',
             borderRadius: '12px',
             background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.5rem',
+            fontSize: '1.6rem',
             boxShadow: 'var(--shadow-glow-cyan)',
+            flexShrink: 0,
           }}
         >
-          🌤️
+          {weatherIcon || '🌤️'}
         </div>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
             <h1
               style={{
                 fontSize: '1.45rem',
@@ -71,6 +82,8 @@ export const Header: React.FC<HeaderProps> = ({
             >
               AeroPulse Weather Station
             </h1>
+
+            {/* Live Indicator */}
             <span
               style={{
                 fontSize: '0.7rem',
@@ -99,16 +112,42 @@ export const Header: React.FC<HeaderProps> = ({
               />
               {isLive ? 'LIVE STREAM' : 'DISCONNECTED'}
             </span>
+
+            {/* Location Pill */}
+            <span
+              style={{
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                letterSpacing: '0.03em',
+                padding: '0.2rem 0.6rem',
+                borderRadius: '9999px',
+                background: 'rgba(6, 182, 212, 0.15)',
+                color: 'var(--accent-cyan)',
+                border: '1px solid rgba(6, 182, 212, 0.35)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <span>📍</span>
+              <span>{locationName}</span>
+            </span>
           </div>
+
           <p
             style={{
               fontSize: '0.8rem',
               color: 'var(--text-muted)',
-              marginTop: '0.15rem',
+              marginTop: '0.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              flexWrap: 'wrap',
             }}
           >
-            Arduino Uno Telemetry &bull; Prisma 5 (SQLite) &bull;{' '}
-            {totalRecords.toLocaleString()} logged readings
+            <span>Real Open-Meteo High-Resolution API &bull; Arduino Uno Hardware Sensor Array</span>
+            <span>&bull;</span>
+            <span>{totalRecords.toLocaleString()} logged packets</span>
           </p>
         </div>
       </div>
@@ -117,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.75rem',
+          gap: '0.65rem',
           flexWrap: 'wrap',
         }}
       >
@@ -133,8 +172,48 @@ export const Header: React.FC<HeaderProps> = ({
               border: '1px solid var(--border-glass)',
             }}
           >
-            Last Ping: {new Date(lastUpdated).toLocaleTimeString()}
+            Ping: {new Date(lastUpdated).toLocaleTimeString()}
           </div>
+        )}
+
+        {/* Sync Lucknow Live Weather Button */}
+        {onSyncLucknow && (
+          <button
+            onClick={onSyncLucknow}
+            disabled={isSyncing}
+            title="Fetch immediate real-time weather update for Lucknow from Open-Meteo"
+            style={{
+              background: 'rgba(16, 185, 129, 0.15)',
+              color: 'var(--accent-emerald)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              padding: '0.5rem 0.85rem',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              cursor: isSyncing ? 'wait' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(16, 185, 129, 0.25)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(16, 185, 129, 0.15)';
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-block',
+                transform: isSyncing ? 'rotate(360deg)' : 'none',
+                transition: isSyncing ? 'transform 0.8s linear infinite' : 'none',
+              }}
+            >
+              ⚡
+            </span>
+            {isSyncing ? 'Syncing...' : 'Sync Lucknow'}
+          </button>
         )}
 
         {onToggleTheme && (
@@ -162,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
             }}
           >
             <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
-            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
           </button>
         )}
 
@@ -226,7 +305,7 @@ export const Header: React.FC<HeaderProps> = ({
             e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)';
           }}
         >
-          📥 Export CSV
+          📥 CSV
         </a>
 
         <button
@@ -257,7 +336,7 @@ export const Header: React.FC<HeaderProps> = ({
               '0 4px 14px rgba(37, 99, 235, 0.35)';
           }}
         >
-          ⚡ Arduino Setup
+          ⚡ Hardware Setup
         </button>
       </div>
     </header>
