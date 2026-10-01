@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { CloudRainIcon, SunIcon, DropletsIcon } from './Icons';
 
 interface RainDetectorCardProps {
   rainValue: number;
@@ -82,18 +83,21 @@ export const RainDetectorCard: React.FC<RainDetectorCardProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span
               style={{
-                fontSize: '1.35rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'var(--item-bg)',
-                border: '1px solid var(--border-glass)',
+                background: isRaining ? 'rgba(6, 182, 212, 0.15)' : 'var(--item-bg)',
+                border: `1px solid ${isRaining ? 'rgba(6, 182, 212, 0.3)' : 'var(--border-glass)'}`,
               }}
             >
-              {isRaining ? '🌧️' : '⛅'}
+              {isRaining ? (
+                <CloudRainIcon size={18} color="var(--accent-cyan)" strokeWidth={2.2} />
+              ) : (
+                <DropletsIcon size={18} color="var(--text-muted)" strokeWidth={2.2} />
+              )}
             </span>
             <span
               style={{
@@ -208,7 +212,13 @@ export const RainDetectorCard: React.FC<RainDetectorCardProps> = ({
           gap: '0.5rem',
         }}
       >
-        <span>{isRaining ? '🌧️' : '☀️'}</span>
+        <span style={{ display: 'inline-flex', flexShrink: 0 }}>
+          {isRaining ? (
+            <CloudRainIcon size={15} color="var(--accent-cyan)" strokeWidth={2.2} />
+          ) : (
+            <SunIcon size={15} color="var(--accent-amber)" strokeWidth={2.2} />
+          )}
+        </span>
         <span>
           {isRaining
             ? 'Active rainfall detected on outdoor collection pad.'

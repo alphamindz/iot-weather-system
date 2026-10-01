@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { SunMediumIcon, ShieldCheckIcon } from './Icons';
 
 interface UVIndexMeterProps {
   uvIndex: number;
@@ -18,7 +19,7 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
         color: '#10b981',
         bg: 'rgba(16, 185, 129, 0.12)',
         border: 'rgba(16, 185, 129, 0.3)',
-        advice: 'Minimal danger for average person. No sun protection required.',
+        advice: 'Minimal danger for average person. Safe for outdoor exposure.',
       };
     } else if (val < 6) {
       return {
@@ -70,6 +71,7 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
         overflow: 'hidden',
       }}
     >
+      {/* Top accent line */}
       <div
         style={{
           position: 'absolute',
@@ -93,18 +95,17 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span
               style={{
-                fontSize: '1.35rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'var(--item-bg)',
-                border: '1px solid var(--border-glass)',
+                background: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
               }}
             >
-              ☀️
+              <SunMediumIcon size={18} color="#f59e0b" strokeWidth={2.2} />
             </span>
             <span
               style={{
@@ -143,7 +144,7 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
             margin: '0.6rem 0',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
             <span
               style={{
                 fontSize: '2.5rem',
@@ -160,22 +161,22 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
             </span>
           </div>
 
-          <span
+          <div
             style={{
-              fontSize: '0.78rem',
+              fontSize: '0.82rem',
               color: 'var(--text-secondary)',
               fontFamily: 'var(--font-mono)',
               background: 'var(--item-bg)',
-              border: '1px solid var(--border-glass)',
-              padding: '0.25rem 0.55rem',
+              padding: '0.25rem 0.6rem',
               borderRadius: '6px',
+              border: '1px solid var(--border-glass)',
             }}
           >
             {uvVoltage.toFixed(2)} V
-          </span>
+          </div>
         </div>
 
-        {/* Dynamic UV Gradient bar */}
+        {/* Dynamic UV Meter Bar */}
         <div style={{ margin: '1rem 0 0.5rem 0' }}>
           <div
             style={{
@@ -191,7 +192,7 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
               style={{
                 height: '100%',
                 width: `${percentage}%`,
-                background: `linear-gradient(90deg, #10b981 0%, #f59e0b 35%, #f97316 60%, #f43f5e 80%, #a855f7 100%)`,
+                background: `linear-gradient(90deg, #10b981 0%, #f59e0b 35%, #f97316 65%, #a855f7 100%)`,
                 borderRadius: '9999px',
                 transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: `0 0 12px ${cat.color}`,
@@ -232,7 +233,9 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
           gap: '0.5rem',
         }}
       >
-        <span>🛡️</span>
+        <span style={{ display: 'inline-flex', flexShrink: 0 }}>
+          <ShieldCheckIcon size={15} color={cat.color} strokeWidth={2.2} />
+        </span>
         <span>{cat.advice}</span>
       </div>
     </div>

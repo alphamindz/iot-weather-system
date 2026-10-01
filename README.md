@@ -1,4 +1,4 @@
-# 🌤️ AeroPulse - IoT Weather Monitoring System
+# 🌤️ IND-SAFE-US - IoT Weather Monitoring System
 
 A real-time meteorological telemetry web application built with **Next.js (App Router)**, **Prisma 5 (SQLite)**, and an **Arduino Uno** hardware sensor station.
 

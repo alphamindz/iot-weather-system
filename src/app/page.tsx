@@ -9,6 +9,17 @@ import { RainDetectorCard } from '@/components/RainDetectorCard';
 import { HistoryChart } from '@/components/HistoryChart';
 import { DataTable } from '@/components/DataTable';
 import { HardwareModal } from '@/components/HardwareModal';
+import {
+  ThermometerIcon,
+  DropletsIcon,
+  GaugeIcon,
+  CompassIcon,
+  ZapIcon,
+  RadarIcon,
+  AlertTriangleIcon,
+  ShieldCheckIcon,
+  renderWeatherIcon,
+} from '@/components/Icons';
 
 interface Reading {
   id: number;
@@ -92,7 +103,8 @@ export default function WeatherDashboard() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
-    const savedTheme = (localStorage.getItem('aeropulse_theme') as 'dark' | 'light' | null) || 'dark';
+    const savedTheme = (localStorage.getItem('ind_safe_us_theme') as 'dark' | 'light' | null) ||
+      (localStorage.getItem('aeropulse_theme') as 'dark' | 'light' | null) || 'dark';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.body.className = savedTheme;
@@ -101,7 +113,7 @@ export default function WeatherDashboard() {
   const handleToggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
-    localStorage.setItem('aeropulse_theme', nextTheme);
+    localStorage.setItem('ind_safe_us_theme', nextTheme);
     document.documentElement.setAttribute('data-theme', nextTheme);
     document.body.className = nextTheme;
   };
@@ -278,25 +290,27 @@ export default function WeatherDashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <div
             style={{
-              fontSize: '2rem',
               width: '52px',
               height: '52px',
-              borderRadius: '12px',
+              borderRadius: '14px',
               background: 'var(--item-bg)',
               border: '1px solid var(--border-glass)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: 'var(--shadow-card)',
+              flexShrink: 0,
             }}
           >
-            {weatherMeta?.conditionIcon || '🌤️'}
+            {renderWeatherIcon(weatherMeta?.condition, weatherMeta?.isDay, 28)}
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
               <h2
                 style={{
-                  fontSize: '1.15rem',
+                  fontSize: '1.2rem',
                   fontWeight: 700,
+                  fontFamily: 'var(--font-display)',
                   color: 'var(--text-primary)',
                   letterSpacing: '-0.01em',
                 }}
@@ -335,8 +349,12 @@ export default function WeatherDashboard() {
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.78rem',
                 fontFamily: 'var(--font-mono)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
               }}
             >
+              <GaugeIcon size={14} color="var(--accent-cyan)" strokeWidth={2.2} />
               <span style={{ color: 'var(--text-muted)' }}>Pressure: </span>
               <strong style={{ color: 'var(--text-primary)' }}>{weatherMeta.pressure.toFixed(1)} hPa</strong>
             </div>
@@ -351,8 +369,12 @@ export default function WeatherDashboard() {
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.78rem',
                 fontFamily: 'var(--font-mono)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
               }}
             >
+              <CompassIcon size={14} color="var(--accent-blue)" strokeWidth={2.2} />
               <span style={{ color: 'var(--text-muted)' }}>Wind: </span>
               <strong style={{ color: 'var(--text-primary)' }}>
                 {weatherMeta.windSpeed} km/h {weatherMeta.windDirection}
@@ -369,8 +391,12 @@ export default function WeatherDashboard() {
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.78rem',
                 fontFamily: 'var(--font-mono)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
               }}
             >
+              <ThermometerIcon size={14} color="var(--accent-cyan)" strokeWidth={2.2} />
               <span style={{ color: 'var(--text-muted)' }}>Feels Like: </span>
               <strong style={{ color: 'var(--accent-cyan)' }}>
                 {displayTemp(weatherMeta.apparentTemperature)}°{tempUnit}
@@ -385,18 +411,19 @@ export default function WeatherDashboard() {
               background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
               color: '#ffffff',
               border: 'none',
-              padding: '0.42rem 0.85rem',
+              padding: '0.42rem 0.9rem',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.78rem',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: isSyncing ? 'wait' : 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.35rem',
+              gap: '0.4rem',
               boxShadow: '0 2px 8px rgba(6, 182, 212, 0.3)',
+              transition: 'all 0.2s ease',
             }}
           >
-            <span>{isSyncing ? '⏳' : '⚡'}</span>
+            <ZapIcon size={13} color="#ffffff" strokeWidth={2.4} />
             <span>{isSyncing ? 'Updating...' : 'Sync Lucknow Data'}</span>
           </button>
         </div>
@@ -416,7 +443,7 @@ export default function WeatherDashboard() {
           title="Temperature"
           value={displayTemp(activeReading.temperature)}
           unit={`°${tempUnit}`}
-          icon="🌡️"
+          icon={<ThermometerIcon size={20} color="var(--accent-cyan)" strokeWidth={2.2} />}
           accentColor="#06b6d4"
           topAction={
             <button
@@ -480,7 +507,7 @@ export default function WeatherDashboard() {
           title="Relative Humidity"
           value={activeReading.humidity.toFixed(1)}
           unit="%"
-          icon="💧"
+          icon={<DropletsIcon size={20} color="var(--accent-blue)" strokeWidth={2.2} />}
           accentColor="#3b82f6"
           secondaryText="Atmospheric water vapor &bull; Lucknow Sensor Baseline"
           minVal={summary?.humMin}
@@ -569,18 +596,31 @@ export default function WeatherDashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <span
                   style={{
-                    fontSize: '1.35rem',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: '36px',
                     height: '36px',
                     borderRadius: '8px',
-                    background: 'var(--item-bg)',
-                    border: '1px solid var(--border-glass)',
+                    background: isObjectDetected
+                      ? 'rgba(245, 158, 11, 0.15)'
+                      : 'rgba(16, 185, 129, 0.15)',
+                    border: `1px solid ${
+                      isObjectDetected
+                        ? 'rgba(245, 158, 11, 0.3)'
+                        : 'rgba(16, 185, 129, 0.3)'
+                    }`,
                   }}
                 >
-                  🎯
+                  <RadarIcon
+                    size={18}
+                    color={
+                      isObjectDetected
+                        ? 'var(--accent-amber)'
+                        : 'var(--accent-emerald)'
+                    }
+                    strokeWidth={2.2}
+                  />
                 </span>
                 <span
                   style={{
@@ -660,7 +700,13 @@ export default function WeatherDashboard() {
               gap: '0.5rem',
             }}
           >
-            <span>{isObjectDetected ? '⚠️' : '✅'}</span>
+            <span style={{ display: 'inline-flex', flexShrink: 0 }}>
+              {isObjectDetected ? (
+                <AlertTriangleIcon size={16} color="var(--accent-amber)" strokeWidth={2.2} />
+              ) : (
+                <ShieldCheckIcon size={16} color="var(--accent-emerald)" strokeWidth={2.2} />
+              )}
+            </span>
             <span>
               {isObjectDetected
                 ? 'Object or obstruction detected directly in front of station sensor array.'
@@ -706,7 +752,7 @@ export default function WeatherDashboard() {
         }}
       >
         <div>
-          <strong>AeroPulse IoT</strong> &bull; Lucknow Meteorological Telemetry Station
+          <strong>IND-SAFE-US IoT</strong> &bull; Lucknow Meteorological Telemetry Station
         </div>
         <div>
           Powered by Open-Meteo High-Resolution Live APIs &bull; Arduino Uno &bull; SQLite &bull; Next.js App Router

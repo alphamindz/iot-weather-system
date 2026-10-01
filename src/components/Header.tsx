@@ -1,6 +1,16 @@
 'use client';
 
 import React from 'react';
+import {
+  CloudSunIcon,
+  MapPinIcon,
+  ZapIcon,
+  SunIcon,
+  MoonIcon,
+  RefreshCwIcon,
+  DownloadIcon,
+  CpuIcon,
+} from './Icons';
 
 interface HeaderProps {
   isLive: boolean;
@@ -57,40 +67,40 @@ export const Header: React.FC<HeaderProps> = ({
             width: '48px',
             height: '48px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
+            background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.6rem',
-            boxShadow: 'var(--shadow-glow-cyan)',
+            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
             flexShrink: 0,
           }}
         >
-          {weatherIcon || '🌤️'}
+          <CloudSunIcon size={26} color="#ffffff" strokeWidth={2.2} />
         </div>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
             <h1
               style={{
-                fontSize: '1.45rem',
+                fontSize: '1.5rem',
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
+                fontFamily: 'var(--font-display)',
                 background: 'var(--heading-gradient)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              AeroPulse Weather Station
+              IND-SAFE-US Weather Station
             </h1>
 
             {/* Live Indicator */}
             <span
               style={{
                 fontSize: '0.7rem',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
+                fontWeight: 700,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                padding: '0.2rem 0.55rem',
+                padding: '0.2rem 0.6rem',
                 borderRadius: '9999px',
                 background: isLive
                   ? 'rgba(16, 185, 129, 0.15)'
@@ -110,26 +120,26 @@ export const Header: React.FC<HeaderProps> = ({
                 className={`pulse-indicator ${isLive ? '' : 'offline'}`}
                 style={{ width: '6px', height: '6px' }}
               />
-              {isLive ? 'LIVE STREAM' : 'DISCONNECTED'}
+              {isLive ? 'LIVE TELEMETRY' : 'STANDBY'}
             </span>
 
             {/* Location Pill */}
             <span
               style={{
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
-                letterSpacing: '0.03em',
-                padding: '0.2rem 0.6rem',
+                letterSpacing: '0.02em',
+                padding: '0.22rem 0.65rem',
                 borderRadius: '9999px',
-                background: 'rgba(6, 182, 212, 0.15)',
+                background: 'rgba(6, 182, 212, 0.12)',
                 color: 'var(--accent-cyan)',
-                border: '1px solid rgba(6, 182, 212, 0.35)',
+                border: '1px solid rgba(6, 182, 212, 0.3)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.35rem',
               }}
             >
-              <span>📍</span>
+              <MapPinIcon size={13} color="var(--accent-cyan)" strokeWidth={2.4} />
               <span>{locationName}</span>
             </span>
           </div>
@@ -145,9 +155,9 @@ export const Header: React.FC<HeaderProps> = ({
               flexWrap: 'wrap',
             }}
           >
-            <span>Real Open-Meteo High-Resolution API &bull; Arduino Uno Hardware Sensor Array</span>
+            <span>High-Precision Open-Meteo API &bull; Arduino Uno Hardware Sensor Array</span>
             <span>&bull;</span>
-            <span>{totalRecords.toLocaleString()} logged packets</span>
+            <span style={{ fontFamily: 'var(--font-mono)' }}>{totalRecords.toLocaleString()} logged packets</span>
           </p>
         </div>
       </div>
@@ -181,6 +191,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onSyncLucknow}
             disabled={isSyncing}
+            id="sync-lucknow-btn"
             title="Fetch immediate real-time weather update for Lucknow from Open-Meteo"
             style={{
               background: 'rgba(16, 185, 129, 0.15)',
@@ -189,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
               padding: '0.5rem 0.85rem',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.82rem',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: isSyncing ? 'wait' : 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -205,49 +216,74 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <span
               style={{
-                display: 'inline-block',
+                display: 'inline-flex',
                 transform: isSyncing ? 'rotate(360deg)' : 'none',
                 transition: isSyncing ? 'transform 0.8s linear infinite' : 'none',
               }}
             >
-              ⚡
+              <ZapIcon size={14} color="var(--accent-emerald)" strokeWidth={2.4} />
             </span>
             {isSyncing ? 'Syncing...' : 'Sync Lucknow'}
           </button>
         )}
 
+        {/* Theme Toggle Pill Button */}
         {onToggleTheme && (
           <button
             onClick={onToggleTheme}
+            id="theme-toggle-btn"
+            title={`Switch to ${theme === 'dark' ? 'Light Mode' : 'Dark Mode'}`}
             style={{
-              background: 'var(--item-bg)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-glass)',
-              padding: '0.5rem 0.85rem',
-              borderRadius: 'var(--radius-sm)',
+              background:
+                theme === 'dark'
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              color: theme === 'dark' ? '#f8fafc' : '#92400e',
+              border:
+                theme === 'dark'
+                  ? '1px solid var(--border-glass)'
+                  : '1px solid rgba(245, 158, 11, 0.45)',
+              padding: '0.48rem 0.9rem',
+              borderRadius: '9999px',
               fontSize: '0.82rem',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.4rem',
-              transition: 'all 0.2s ease',
+              gap: '0.45rem',
+              boxShadow:
+                theme === 'dark'
+                  ? 'none'
+                  : '0 2px 10px rgba(245, 158, 11, 0.25)',
+              transition: 'all 0.25s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--item-bg-hover)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              if (theme === 'dark') {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.14)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--item-bg)';
+              e.currentTarget.style.transform = 'none';
+              if (theme === 'dark') {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+              }
             }}
           >
-            <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
-            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+            {theme === 'dark' ? (
+              <SunIcon size={15} color="#f59e0b" strokeWidth={2.4} />
+            ) : (
+              <MoonIcon size={15} color="#92400e" strokeWidth={2.4} />
+            )}
+            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
           </button>
         )}
 
+        {/* Refresh Button */}
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
+          id="refresh-telemetry-btn"
           style={{
             background: 'var(--item-bg)',
             color: 'var(--text-primary)',
@@ -255,7 +291,7 @@ export const Header: React.FC<HeaderProps> = ({
             padding: '0.5rem 0.9rem',
             borderRadius: 'var(--radius-sm)',
             fontSize: '0.82rem',
-            fontWeight: 500,
+            fontWeight: 600,
             cursor: isRefreshing ? 'wait' : 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
@@ -271,27 +307,29 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <span
             style={{
-              display: 'inline-block',
+              display: 'inline-flex',
               transform: isRefreshing ? 'rotate(360deg)' : 'none',
               transition: isRefreshing ? 'transform 0.8s linear infinite' : 'none',
             }}
           >
-            🔄
+            <RefreshCwIcon size={14} color="currentColor" strokeWidth={2.2} />
           </span>
           Refresh
         </button>
 
+        {/* Export CSV Button */}
         <a
           href="/api/telemetry/export"
           download
+          id="export-csv-btn"
           style={{
-            background: 'rgba(59, 130, 246, 0.15)',
+            background: 'rgba(59, 130, 246, 0.12)',
             color: 'var(--accent-blue)',
             border: '1px solid rgba(59, 130, 246, 0.3)',
             padding: '0.5rem 0.9rem',
             borderRadius: 'var(--radius-sm)',
             fontSize: '0.82rem',
-            fontWeight: 600,
+            fontWeight: 700,
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
@@ -299,17 +337,20 @@ export const Header: React.FC<HeaderProps> = ({
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.25)';
+            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.22)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)';
+            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.12)';
           }}
         >
-          📥 CSV
+          <DownloadIcon size={14} color="var(--accent-blue)" strokeWidth={2.2} />
+          CSV
         </a>
 
+        {/* Arduino Setup Button */}
         <button
           onClick={onOpenHardwareModal}
+          id="hardware-setup-btn"
           style={{
             background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
             color: '#ffffff',
@@ -317,7 +358,7 @@ export const Header: React.FC<HeaderProps> = ({
             padding: '0.5rem 1rem',
             borderRadius: 'var(--radius-sm)',
             fontSize: '0.82rem',
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
@@ -336,7 +377,8 @@ export const Header: React.FC<HeaderProps> = ({
               '0 4px 14px rgba(37, 99, 235, 0.35)';
           }}
         >
-          ⚡ Hardware Setup
+          <CpuIcon size={15} color="#ffffff" strokeWidth={2.2} />
+          Hardware Setup
         </button>
       </div>
     </header>

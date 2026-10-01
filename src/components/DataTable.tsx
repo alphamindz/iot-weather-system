@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { TableIcon } from './Icons';
 
 interface Reading {
   id: number;
@@ -56,20 +57,38 @@ export const DataTable: React.FC<DataTableProps> = ({ readings }) => {
           marginBottom: '1.25rem',
         }}
       >
-        <div>
-          <h2
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <span
             style={{
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              letterSpacing: '-0.01em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'var(--item-bg)',
+              border: '1px solid var(--border-glass)',
+              color: 'var(--accent-blue)',
             }}
           >
-            Live Telemetry Log
-          </h2>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Showing latest {displayList.length} sensor packets received by API
-          </p>
+            <TableIcon size={18} color="var(--accent-blue)" strokeWidth={2.2} />
+          </span>
+          <div>
+            <h2
+              style={{
+                fontSize: '1.15rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-display)',
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Live Telemetry Log
+            </h2>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Showing latest {displayList.length} sensor packets received by API
+            </p>
+          </div>
         </div>
 
         <span

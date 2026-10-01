@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { LeafIcon, SparklesIcon } from './Icons';
 
 interface AirQualityMeterProps {
   gasValue: number;
@@ -97,18 +98,17 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span
               style={{
-                fontSize: '1.35rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'var(--item-bg)',
-                border: '1px solid var(--border-glass)',
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
               }}
             >
-              🍃
+              <LeafIcon size={18} color="#10b981" strokeWidth={2.2} />
             </span>
             <span
               style={{
@@ -252,7 +252,9 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
           gap: '0.5rem',
         }}
       >
-        <span>💡</span>
+        <span style={{ display: 'inline-flex', flexShrink: 0 }}>
+          <SparklesIcon size={14} color={config.color} strokeWidth={2.2} />
+        </span>
         <span>{config.advice}</span>
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { CpuIcon, FileCodeIcon } from './Icons';
 
 interface HardwareModalProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(3, 7, 18, 0.8)',
+        backgroundColor: 'var(--modal-overlay, rgba(3, 7, 18, 0.75))',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
@@ -66,9 +67,30 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.6rem' }}>⚡</span>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+                flexShrink: 0,
+              }}
+            >
+              <CpuIcon size={22} color="#ffffff" strokeWidth={2.2} />
+            </div>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              <h3
+                style={{
+                  fontSize: '1.3rem',
+                  fontWeight: 700,
+                  fontFamily: 'var(--font-display)',
+                  color: 'var(--text-primary)',
+                }}
+              >
                 Arduino Uno & Hardware Connection Guide
               </h3>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -242,8 +264,9 @@ export const HardwareModal: React.FC<HardwareModalProps> = ({
             color: 'var(--text-secondary)',
           }}
         >
-          <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.3rem' }}>
-            📄 Arduino Sketches Available in Project:
+          <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <FileCodeIcon size={16} color="var(--accent-cyan)" />
+            <span>Arduino Sketches Available in Project:</span>
           </p>
           <ul style={{ paddingLeft: '1.25rem', lineHeight: 1.6 }}>
             <li>

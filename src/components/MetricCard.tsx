@@ -6,7 +6,7 @@ interface MetricCardProps {
   title: string;
   value: string | number;
   unit?: string;
-  icon: string;
+  icon: React.ReactNode;
   accentColor?: string;
   secondaryText?: string;
   minVal?: number;

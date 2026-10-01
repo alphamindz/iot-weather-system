@@ -1,6 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import {
+  BarChart3Icon,
+  ThermometerIcon,
+  DropletsIcon,
+  LeafIcon,
+  SunMediumIcon,
+} from './Icons';
 
 interface Reading {
   id: number;
@@ -40,10 +47,10 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
           color: 'var(--text-muted)',
         }}
       >
-        <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>
-          📊
+        <span style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+          <BarChart3Icon size={38} color="var(--accent-cyan)" strokeWidth={1.8} />
         </span>
-        <p style={{ fontWeight: 500 }}>Collecting Telemetry History...</p>
+        <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Collecting Telemetry History...</p>
         <p style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
           At least 2 data points required to render continuous trends.
         </p>
@@ -57,6 +64,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
       unit: '°C',
       color: '#06b6d4',
       gradientId: 'tempGrad',
+      icon: <ThermometerIcon size={14} color="currentColor" strokeWidth={2.4} />,
       min: Math.min(...data.map((d) => d.temperature)) - 2,
       max: Math.max(...data.map((d) => d.temperature)) + 2,
     },
@@ -65,14 +73,16 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
       unit: '%',
       color: '#3b82f6',
       gradientId: 'humGrad',
+      icon: <DropletsIcon size={14} color="currentColor" strokeWidth={2.4} />,
       min: Math.max(0, Math.min(...data.map((d) => d.humidity)) - 5),
       max: Math.min(100, Math.max(...data.map((d) => d.humidity)) + 5),
     },
     gasValue: {
-      label: 'Air Quality (MQ135)',
+      label: 'Air Quality (AQI)',
       unit: 'AQI',
       color: '#f59e0b',
       gradientId: 'gasGrad',
+      icon: <LeafIcon size={14} color="currentColor" strokeWidth={2.4} />,
       min: Math.max(0, Math.min(...data.map((d) => d.gasValue)) - 30),
       max: Math.max(...data.map((d) => d.gasValue)) + 40,
     },
@@ -81,6 +91,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
       unit: 'UV',
       color: '#a855f7',
       gradientId: 'uvGrad',
+      icon: <SunMediumIcon size={14} color="currentColor" strokeWidth={2.4} />,
       min: 0,
       max: Math.max(8, Math.max(...data.map((d) => d.uvIndex)) + 1),
     },
@@ -130,20 +141,38 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
           marginBottom: '1.25rem',
         }}
       >
-        <div>
-          <h2
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <span
             style={{
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              letterSpacing: '-0.01em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'var(--item-bg)',
+              border: '1px solid var(--border-glass)',
+              color: 'var(--accent-cyan)',
             }}
           >
-            Environmental Telemetry Trends
-          </h2>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Real-time multi-sensor historical trends & fluctuations
-          </p>
+            <BarChart3Icon size={18} color="var(--accent-cyan)" strokeWidth={2.2} />
+          </span>
+          <div>
+            <h2
+              style={{
+                fontSize: '1.15rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-display)',
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Environmental Telemetry Trends
+            </h2>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Real-time multi-sensor historical trends & fluctuations
+            </p>
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -171,12 +200,16 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                   padding: '0.4rem 0.8rem',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.78rem',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
                   transition: 'all 0.2s ease',
                 }}
               >
-                {metricConfigs[m].label}
+                {metricConfigs[m].icon}
+                <span>{metricConfigs[m].label}</span>
               </button>
             );
           })}
@@ -208,8 +241,9 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({
                   padding: '0.35rem 0.6rem',
                   borderRadius: '6px',
                   fontSize: '0.72rem',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: 'pointer',
+                  fontFamily: 'var(--font-mono)',
                 }}
               >
                 {r.toUpperCase()}
