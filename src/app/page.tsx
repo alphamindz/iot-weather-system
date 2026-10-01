@@ -241,42 +241,42 @@ export default function WeatherDashboard() {
             </button>
           }
           secondaryText={`Feels like ${displayTemp(heatIndex)}°${tempUnit} • DHT11 Sensor`}
-            minVal={
-              summary
-                ? tempUnit === 'F'
-                  ? parseFloat(((summary.tempMin * 9) / 5 + 32).toFixed(1))
-                  : summary.tempMin
-                : undefined
-            }
-            maxVal={
-              summary
-                ? tempUnit === 'F'
-                  ? parseFloat(((summary.tempMax * 9) / 5 + 32).toFixed(1))
-                  : summary.tempMax
-                : undefined
-            }
-            avgVal={
-              summary
-                ? tempUnit === 'F'
-                  ? parseFloat(((summary.tempAvg * 9) / 5 + 32).toFixed(1))
-                  : summary.tempAvg
-                : undefined
-            }
-            statusBadge={{
-              text:
-                activeReading.temperature > 30
-                  ? 'HOT'
-                  : activeReading.temperature < 18
+          minVal={
+            summary
+              ? tempUnit === 'F'
+                ? parseFloat(((summary.tempMin * 9) / 5 + 32).toFixed(1))
+                : summary.tempMin
+              : undefined
+          }
+          maxVal={
+            summary
+              ? tempUnit === 'F'
+                ? parseFloat(((summary.tempMax * 9) / 5 + 32).toFixed(1))
+                : summary.tempMax
+              : undefined
+          }
+          avgVal={
+            summary
+              ? tempUnit === 'F'
+                ? parseFloat(((summary.tempAvg * 9) / 5 + 32).toFixed(1))
+                : summary.tempAvg
+              : undefined
+          }
+          statusBadge={{
+            text:
+              activeReading.temperature > 30
+                ? 'HOT'
+                : activeReading.temperature < 18
                   ? 'COOL'
                   : 'NORMAL',
-              type:
-                activeReading.temperature > 30
-                  ? 'warning'
-                  : activeReading.temperature < 18
+            type:
+              activeReading.temperature > 30
+                ? 'warning'
+                : activeReading.temperature < 18
                   ? 'info'
                   : 'success',
-            }}
-          />
+          }}
+        />
 
         {/* Humidity Card */}
         <MetricCard
@@ -294,14 +294,14 @@ export default function WeatherDashboard() {
               activeReading.humidity > 70
                 ? 'HUMID'
                 : activeReading.humidity < 35
-                ? 'DRY'
-                : 'OPTIMAL',
+                  ? 'DRY'
+                  : 'OPTIMAL',
             type:
               activeReading.humidity > 70
                 ? 'warning'
                 : activeReading.humidity < 35
-                ? 'info'
-                : 'success',
+                  ? 'info'
+                  : 'success',
           }}
         />
 
@@ -408,11 +408,10 @@ export default function WeatherDashboard() {
                   color: isObjectDetected
                     ? 'var(--accent-amber)'
                     : 'var(--accent-emerald)',
-                  border: `1px solid ${
-                    isObjectDetected
+                  border: `1px solid ${isObjectDetected
                       ? 'rgba(245, 158, 11, 0.3)'
                       : 'rgba(16, 185, 129, 0.3)'
-                  }`,
+                    }`,
                   letterSpacing: '0.05em',
                 }}
               >

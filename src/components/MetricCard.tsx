@@ -60,9 +60,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         };
       default:
         return {
-          bg: 'rgba(255, 255, 255, 0.08)',
+          bg: 'var(--item-bg)',
           color: 'var(--text-secondary)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
+          border: '1px solid var(--border-glass)',
         };
     }
   };
@@ -112,7 +112,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               width: '36px',
               height: '36px',
               borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.05)',
+              background: 'var(--item-bg)',
               border: '1px solid var(--border-glass)',
             }}
           >
@@ -199,7 +199,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
             justifyContent: 'space-between',
             paddingTop: '0.75rem',
             marginTop: '0.5rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid var(--border-glass)',
             fontSize: '0.74rem',
             color: 'var(--text-muted)',
             fontFamily: 'var(--font-mono)',

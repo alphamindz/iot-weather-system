@@ -89,7 +89,7 @@ export const RainDetectorCard: React.FC<RainDetectorCardProps> = ({
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'var(--item-bg)',
                 border: '1px solid var(--border-glass)',
               }}
             >
@@ -116,10 +116,10 @@ export const RainDetectorCard: React.FC<RainDetectorCardProps> = ({
               borderRadius: '9999px',
               background: isRaining
                 ? 'rgba(6, 182, 212, 0.15)'
-                : 'rgba(255, 255, 255, 0.06)',
+                : 'var(--item-bg)',
               color: isRaining ? 'var(--accent-cyan)' : 'var(--text-muted)',
               border: `1px solid ${
-                isRaining ? 'rgba(6, 182, 212, 0.3)' : 'rgba(255, 255, 255, 0.1)'
+                isRaining ? 'rgba(6, 182, 212, 0.3)' : 'var(--border-glass)'
               }`,
               letterSpacing: '0.05em',
             }}
@@ -162,7 +162,7 @@ export const RainDetectorCard: React.FC<RainDetectorCardProps> = ({
             style={{
               height: '8px',
               width: '100%',
-              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              backgroundColor: 'var(--item-bg)',
               borderRadius: '9999px',
               overflow: 'hidden',
             }}
@@ -199,8 +199,8 @@ export const RainDetectorCard: React.FC<RainDetectorCardProps> = ({
           marginTop: '1rem',
           padding: '0.65rem 0.85rem',
           borderRadius: 'var(--radius-sm)',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          background: 'var(--item-bg)',
+          border: '1px solid var(--border-glass)',
           fontSize: '0.78rem',
           color: 'var(--text-secondary)',
           display: 'flex',

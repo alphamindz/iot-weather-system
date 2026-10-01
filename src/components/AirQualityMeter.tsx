@@ -100,7 +100,7 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'var(--item-bg)',
                 border: '1px solid var(--border-glass)',
               }}
             >
@@ -158,7 +158,7 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
             style={{
               height: '8px',
               width: '100%',
-              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              backgroundColor: 'var(--item-bg)',
               borderRadius: '9999px',
               overflow: 'hidden',
               position: 'relative',
@@ -199,8 +199,8 @@ export const AirQualityMeter: React.FC<AirQualityMeterProps> = ({
           marginTop: '1rem',
           padding: '0.65rem 0.85rem',
           borderRadius: 'var(--radius-sm)',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          background: 'var(--item-bg)',
+          border: '1px solid var(--border-glass)',
           fontSize: '0.78rem',
           color: 'var(--text-secondary)',
           display: 'flex',

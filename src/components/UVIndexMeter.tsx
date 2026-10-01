@@ -100,7 +100,7 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'var(--item-bg)',
                 border: '1px solid var(--border-glass)',
               }}
             >
@@ -165,7 +165,8 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
               fontSize: '0.78rem',
               color: 'var(--text-secondary)',
               fontFamily: 'var(--font-mono)',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--item-bg)',
+              border: '1px solid var(--border-glass)',
               padding: '0.25rem 0.55rem',
               borderRadius: '6px',
             }}
@@ -180,7 +181,7 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
             style={{
               height: '8px',
               width: '100%',
-              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              backgroundColor: 'var(--item-bg)',
               borderRadius: '9999px',
               overflow: 'hidden',
               position: 'relative',
@@ -222,8 +223,8 @@ export const UVIndexMeter: React.FC<UVIndexMeterProps> = ({
           marginTop: '1rem',
           padding: '0.65rem 0.85rem',
           borderRadius: 'var(--radius-sm)',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          background: 'var(--item-bg)',
+          border: '1px solid var(--border-glass)',
           fontSize: '0.78rem',
           color: 'var(--text-secondary)',
           display: 'flex',

@@ -34,9 +34,11 @@ export const Header: React.FC<HeaderProps> = ({
         padding: '1.25rem 1.75rem',
         marginBottom: '2rem',
         borderRadius: 'var(--radius-lg)',
-        background: 'rgba(15, 23, 42, 0.65)',
+        background: 'var(--header-bg)',
         backdropFilter: 'blur(20px)',
         border: '1px solid var(--border-glass)',
+        boxShadow: 'var(--shadow-card)',
+        transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -45,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
             width: '46px',
             height: '46px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+            background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -62,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
                 fontSize: '1.45rem',
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
-                background: 'linear-gradient(to right, #f8fafc, #94a3b8)',
+                background: 'var(--heading-gradient)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -125,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
               fontSize: '0.78rem',
               color: 'var(--text-secondary)',
               fontFamily: 'var(--font-mono)',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--item-bg)',
               padding: '0.45rem 0.8rem',
               borderRadius: 'var(--radius-sm)',
               border: '1px solid var(--border-glass)',
@@ -139,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onToggleTheme}
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
+              background: 'var(--item-bg)',
               color: 'var(--text-primary)',
               border: '1px solid var(--border-glass)',
               padding: '0.5rem 0.85rem',
@@ -152,6 +154,12 @@ export const Header: React.FC<HeaderProps> = ({
               gap: '0.4rem',
               transition: 'all 0.2s ease',
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--item-bg-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--item-bg)';
+            }}
           >
             <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
             <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
@@ -162,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onRefresh}
           disabled={isRefreshing}
           style={{
-            background: 'rgba(255, 255, 255, 0.06)',
+            background: 'var(--item-bg)',
             color: 'var(--text-primary)',
             border: '1px solid var(--border-glass)',
             padding: '0.5rem 0.9rem',
@@ -176,10 +184,10 @@ export const Header: React.FC<HeaderProps> = ({
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.background = 'var(--item-bg-hover)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+            e.currentTarget.style.background = 'var(--item-bg)';
           }}
         >
           <span
@@ -199,12 +207,12 @@ export const Header: React.FC<HeaderProps> = ({
           download
           style={{
             background: 'rgba(59, 130, 246, 0.15)',
-            color: '#60a5fa',
+            color: 'var(--accent-blue)',
             border: '1px solid rgba(59, 130, 246, 0.3)',
             padding: '0.5rem 0.9rem',
             borderRadius: 'var(--radius-sm)',
             fontSize: '0.82rem',
-            fontWeight: 500,
+            fontWeight: 600,
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',

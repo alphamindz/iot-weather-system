@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
         clearInterval(pingInterval);
         try {
           controller.close();
-        } catch {}
+        } catch { }
       });
     },
   });
